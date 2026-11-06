@@ -191,14 +191,25 @@ router.get(
   asyncHandler(async (req, res) => {
     const { page, pageSize } = pageArgs(req.query);
     const search = String(req.query.search || "");
-    const where = search
-      ? {
-          OR: [
-            { full_name: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {};
+    const filters = parse(
+      z.object({
+        role: z.enum(["ADMIN", "STAFF"]).optional(),
+        status: z.enum(["active", "inactive"]).optional(),
+      }),
+      req.query,
+    );
+    const where = {
+      ...(search
+        ? {
+            OR: [
+              { full_name: { contains: search, mode: "insensitive" } },
+              { email: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+      ...(filters.role ? { roles: { name: filters.role } } : {}),
+      ...(filters.status ? { is_active: filters.status === "active" } : {}),
+    };
     const [items, total] = await Promise.all([
       prisma.users.findMany({
         where,
@@ -251,7 +262,29 @@ router.put(
   roles("ADMIN"),
   asyncHandler(async (req, res) => {
     const i = parse(userInput, req.body);
+    const target = await prisma.users.findUnique({
+      where: { id: req.params.id },
+      include: { roles: true },
+    });
+    if (!target) throw new HttpError(404, "ไม่พบผู้ใช้");
     const role = await prisma.roles.findUnique({ where: { name: i.role } });
+    if (!role) throw new HttpError(400, "ไม่พบ Role");
+    const isRemovingActiveAdmin =
+      target.is_active &&
+      target.roles.name === "ADMIN" &&
+      (i.role !== "ADMIN" || i.isActive === false);
+    if (
+      isRemovingActiveAdmin &&
+      (await prisma.users.count({
+        where: { is_active: true, roles: { name: "ADMIN" } },
+      })) <= 1
+    )
+      throw new HttpError(
+        400,
+        "ไม่สามารถเปลี่ยน Role หรือระงับ Admin คนสุดท้าย",
+      );
+    if (target.id === req.user.id && i.isActive === false)
+      throw new HttpError(400, "ไม่สามารถระงับบัญชีของตนเอง");
     const data = {
       full_name: i.fullName,
       email: i.email.toLowerCase(),

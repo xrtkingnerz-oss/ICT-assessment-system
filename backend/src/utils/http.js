@@ -16,6 +16,8 @@ export const safeUser = (user) => ({
   email: user.email,
   isActive: user.is_active,
   role: user.roles?.name,
+  createdAt: user.created_at,
+  updatedAt: user.updated_at,
 });
 export const pageArgs = (query) => ({
   page: Math.max(1, Number(query.page) || 1),
