@@ -6,4 +6,6 @@ Frontend แบบ SPA ทำงานที่ Vite และเรียก AP
 
 การป้องกันข้อมูล: bcrypt cost 12, JWT secret ใน environment, Helmet, CORS allowlist, rate limit, Zod validation, transaction ตอนรับคำตอบ, lock คำถามหลังเผยแพร่หรือมีคำตอบ, ป้องกันลบ Admin คนสุดท้ายและหมวดหมู่ที่ถูกอ้างอิง
 
+ชุดข้อมูลสาธิตเพิ่มเติมเพิ่มได้ด้วย `npm run demo:add` ใน `backend` โดยสร้างแบบประเมินปิดรับที่ติดป้าย `[ข้อมูลสาธิต]`, คำถาม 4 ข้อ และคำตอบนิรนาม 18 รายการ ใช้สำหรับแสดง Dashboard/รายงาน ไม่ใช่ข้อมูลผลประเมินจริง และไม่แก้ seed records เดิม
+
 ข้อจำกัด: idempotency key ของ public submission เก็บใน memory ของ process และหมดอายุในหนึ่งชั่วโมง; ถ้า restart ระหว่าง retry จะไม่มีบันทึก idempotency ข้าม process เพราะ schema เดิมไม่มีคอลัมน์สำหรับ key
