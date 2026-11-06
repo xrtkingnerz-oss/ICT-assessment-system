@@ -1487,26 +1487,52 @@ function ReportsPage() {
         </label>
         {data && (
           <>
-            <div className="report-stats">
-              <div>
-                <small>ผู้ตอบทั้งหมด</small>
-                <b>{data.summary.total}</b>
+            <div className="stat-grid report-stat-grid">
+              <div className="stat-card">
+                <div className="stat-icon blue">
+                  <Users size={18} />
+                </div>
+                <div className="stat-title">ผู้ตอบทั้งหมด</div>
+                <div className="stat-value">
+                  {data.summary.total}
+                  <small>คน</small>
+                </div>
+                <div className="stat-foot">จำนวนคำตอบของแบบประเมินนี้</div>
               </div>
-              <div>
-                <small>ภายใน</small>
-                <b>{data.summary.internal}</b>
+              <div className="stat-card">
+                <div className="stat-icon green">
+                  <ShieldCheck size={18} />
+                </div>
+                <div className="stat-title">ผู้ตอบภายใน</div>
+                <div className="stat-value">
+                  {data.summary.internal}
+                  <small>คน</small>
+                </div>
+                <div className="stat-foot">บุคลากรภายในหน่วยงาน</div>
               </div>
-              <div>
-                <small>ภายนอก</small>
-                <b>{data.summary.external}</b>
+              <div className="stat-card">
+                <div className="stat-icon purple">
+                  <Users size={18} />
+                </div>
+                <div className="stat-title">ผู้ตอบภายนอก</div>
+                <div className="stat-value">
+                  {data.summary.external}
+                  <small>คน</small>
+                </div>
+                <div className="stat-foot">ผู้รับบริการภายนอก</div>
               </div>
-              <div>
-                <small>คะแนนเฉลี่ย</small>
-                <b>
+              <div className="stat-card">
+                <div className="stat-icon orange">
+                  <Activity size={18} />
+                </div>
+                <div className="stat-title">คะแนนเฉลี่ย</div>
+                <div className="stat-value">
                   {data.summary.average == null
                     ? "—"
                     : data.summary.average.toFixed(2)}
-                </b>
+                  <small>/ 5</small>
+                </div>
+                <div className="stat-foot">คำนวณจากคำถามแบบให้คะแนน</div>
               </div>
             </div>
             <div className="button-row">

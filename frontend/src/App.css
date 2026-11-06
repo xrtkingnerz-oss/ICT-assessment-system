@@ -697,26 +697,8 @@ td b {
 .inline-form + .searchbox {
   margin-bottom: 12px;
 }
-.report-stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
+.report-stat-grid {
   margin: 18px 0;
-  padding: 15px;
-  background: #f7f9fb;
-  border-radius: 8px;
-}
-.report-stats div {
-  display: grid;
-  gap: 4px;
-}
-.report-stats small {
-  font-size: 9px;
-  color: #8d9ba8;
-}
-.report-stats b {
-  font: 700 18px Manrope;
-  color: #294a64;
 }
 .narrow {
   max-width: 520px;
