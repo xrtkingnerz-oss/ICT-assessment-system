@@ -521,8 +521,11 @@ router.put(
     if (!a) throw new HttpError(404, "ไม่พบแบบประเมิน");
     if (req.user.roles.name !== "ADMIN" && a.created_by !== req.user.id)
       throw new HttpError(403, "ไม่มีสิทธิ์เข้าถึง");
-    if (a._count.responses)
-      throw new HttpError(409, "แบบประเมินมีคำตอบแล้ว จึงแก้ไขไม่ได้");
+    if (a.status !== "DRAFT" || a._count.responses)
+      throw new HttpError(
+        409,
+        "แบบประเมินที่เผยแพร่ ปิดแล้ว หรือมีคำตอบ จะล็อกการแก้ไข ใช้ทำสำเนาเพื่อสร้างฉบับร่าง",
+      );
     const i = parse(assessmentInput, req.body);
     const updated = await prisma.assessments.update({
       where: { id: a.id },

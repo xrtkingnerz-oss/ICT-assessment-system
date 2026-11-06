@@ -497,6 +497,7 @@ function Empty({ title, text }: { title: string; text: string }) {
   );
 }
 function AssessmentList() {
+  const navigate = useNavigate();
   const [items, setItems] = useState<Assessment[]>([]);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
@@ -518,6 +519,17 @@ function AssessmentList() {
           </Link>
         }
       />
+      <div className="assessment-guide">
+        <b>เริ่มทำแบบประเมินสำหรับทดสอบ</b>
+        <span>
+          สร้างแบบประเมินใหม่ → เพิ่มคำถาม → เผยแพร่ → เปิดลิงก์หรือสแกน QR
+          เพื่อลองตอบ
+        </span>
+        <small>
+          แบบประเมินที่เผยแพร่แล้วหรือมีคำตอบ จะล็อกการแก้ไขเพื่อรักษาข้อมูลเดิม
+          ใช้ “ทำสำเนา” เพื่อสร้างฉบับร่างสำหรับแก้ไขหรือทดสอบ
+        </small>
+      </div>
       <div className="toolbar">
         <label className="searchbox">
           <Search size={17} />
@@ -558,9 +570,29 @@ function AssessmentList() {
                 </td>
                 <td>{a.responseCount || 0}</td>
                 <td>
-                  <Link className="text-action" to={`/assessments/${a.id}`}>
-                    เปิดจัดการ →
-                  </Link>
+                  <div className="assessment-actions">
+                    <Link className="text-action" to={`/assessments/${a.id}`}>
+                      เปิด →
+                    </Link>
+                    <button
+                      className="text-action-button"
+                      onClick={async () => {
+                        try {
+                          const response = await api.post(
+                            `/assessments/${a.id}/duplicate`,
+                          );
+                          navigate(`/assessments/${response.data.data.id}`);
+                        } catch (error: any) {
+                          setError(
+                            error.response?.data?.error?.message ||
+                              "ทำสำเนาแบบประเมินไม่สำเร็จ",
+                          );
+                        }
+                      }}
+                    >
+                      ทำสำเนา
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}
@@ -584,6 +616,11 @@ function AssessmentEditor() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [message, setMessage] = useState("");
   const [qrUrl, setQrUrl] = useState("");
+  const [isDuplicating, setIsDuplicating] = useState(false);
+  const isLocked = Boolean(
+    assessment &&
+    (assessment.status !== "DRAFT" || (assessment.responseCount || 0) > 0),
+  );
   useEffect(() => {
     api.get("/categories").then((r) => setCategories(r.data.data));
     if (id)
@@ -592,9 +629,30 @@ function AssessmentEditor() {
         .then((r) => {
           setAssessment(r.data.data);
           setQuestions(r.data.data.questions || []);
+          if (r.data.data.publicToken) {
+            setQrUrl(
+              `${window.location.origin}/assessment/${r.data.data.publicToken}`,
+            );
+          }
         })
         .catch(() => setMessage("เปิดแบบประเมินไม่สำเร็จ"));
   }, [id]);
+  const duplicateAssessment = async () => {
+    if (!assessment) return;
+    setIsDuplicating(true);
+    try {
+      const response = await api.post(
+        `/assessments/${assessment.id}/duplicate`,
+      );
+      navigate(`/assessments/${response.data.data.id}`);
+    } catch (error: any) {
+      setMessage(
+        error.response?.data?.error?.message || "ทำสำเนาแบบประเมินไม่สำเร็จ",
+      );
+    } finally {
+      setIsDuplicating(false);
+    }
+  };
   const saveAssessment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
@@ -696,7 +754,7 @@ function AssessmentEditor() {
     <section className="content">
       <PageHeader
         title={id ? "แก้ไขแบบประเมิน" : "สร้างแบบประเมิน"}
-        subtitle="กำหนดข้อมูลและคำถาม จากนั้นเผยแพร่พร้อม QR Code"
+        subtitle="1. บันทึกรายละเอียด  2. เพิ่มคำถาม  3. เผยแพร่เพื่อรับคำตอบ"
         action={
           <button
             className="button outline"
@@ -707,19 +765,56 @@ function AssessmentEditor() {
         }
       />
       {message && <div className="alert info">{message}</div>}
+      {isLocked && assessment && (
+        <div className="assessment-lock-notice">
+          <div>
+            <b>
+              แบบประเมินนี้
+              {assessment.status === "PUBLISHED"
+                ? "เผยแพร่แล้ว"
+                : "ปิดรับคำตอบแล้ว"}
+              {assessment.responseCount
+                ? ` และมีคำตอบ ${assessment.responseCount} รายการ`
+                : ""}
+            </b>
+            <span>
+              ระบบล็อกการแก้ไขเพื่อรักษาคำถามและข้อมูลคำตอบเดิม
+              ทำสำเนาเป็นฉบับร่างหากต้องการแก้ไขหรือใช้ทดสอบ
+            </span>
+          </div>
+          <button
+            className="button primary"
+            onClick={() => void duplicateAssessment()}
+            disabled={isDuplicating}
+          >
+            <ClipboardList size={16} />
+            {isDuplicating ? "กำลังทำสำเนา…" : "ทำสำเนาเป็นฉบับร่าง"}
+          </button>
+        </div>
+      )}
       <div className="editor-grid">
         <div className="panel form-panel">
           <h2>รายละเอียดแบบประเมิน</h2>
-          <form onSubmit={saveAssessment} className="form-grid">
+          <form
+            key={assessment?.id || "new-assessment"}
+            onSubmit={saveAssessment}
+            className="form-grid"
+          >
             <label>
               ชื่อแบบประเมิน
-              <input name="title" required defaultValue={assessment?.title} />
+              <input
+                name="title"
+                required
+                disabled={isLocked}
+                defaultValue={assessment?.title}
+              />
             </label>
             <label>
               หมวดหมู่
               <select
                 name="categoryId"
                 required
+                disabled={isLocked}
                 defaultValue={assessment?.categoryId || ""}
               >
                 <option value="" disabled>
@@ -736,6 +831,7 @@ function AssessmentEditor() {
               กลุ่มเป้าหมาย
               <select
                 name="targetGroup"
+                disabled={isLocked}
                 defaultValue={assessment?.targetGroup || "BOTH"}
               >
                 <option value="BOTH">ภายในและภายนอก</option>
@@ -748,11 +844,14 @@ function AssessmentEditor() {
               <textarea
                 name="description"
                 rows={3}
+                disabled={isLocked}
                 defaultValue={(assessment as any)?.description || ""}
               />
             </label>
             <div className="span-2">
-              <button className="button primary">บันทึกรายละเอียด</button>
+              <button className="button primary" disabled={isLocked}>
+                บันทึกรายละเอียด
+              </button>
               {assessment && (
                 <span className="inline-status">
                   <Status value={assessment.status} />
@@ -763,44 +862,46 @@ function AssessmentEditor() {
         </div>
         {assessment && (
           <div className="panel form-panel">
-            <h2>เพิ่มคำถาม</h2>
-            <form onSubmit={addQuestion} className="form-grid">
-              <label className="span-2">
-                ข้อความคำถาม
-                <input
-                  name="questionText"
-                  required
-                  placeholder="เช่น ท่านพึงพอใจต่อการให้บริการเพียงใด"
-                />
-              </label>
-              <label>
-                ประเภทคำถาม
-                <select name="questionType">
-                  <option value="RATING">คะแนน 1–5</option>
-                  <option value="SINGLE_CHOICE">เลือกหนึ่งข้อ</option>
-                  <option value="MULTIPLE_CHOICE">เลือกได้หลายข้อ</option>
-                  <option value="SHORT_TEXT">ข้อความสั้น</option>
-                  <option value="LONG_TEXT">ข้อความยาว</option>
-                  <option value="NUMBER">ตัวเลข</option>
-                </select>
-              </label>
-              <label className="check-label">
-                <input name="required" type="checkbox" /> จำเป็นต้องตอบ
-              </label>
-              <label className="span-2">
-                ตัวเลือก{" "}
-                <small>(หนึ่งรายการต่อบรรทัด สำหรับคำถามแบบเลือก)</small>
-                <textarea
-                  name="options"
-                  rows={3}
-                  placeholder={"ดีมาก\nปานกลาง\nน้อย"}
-                />
-              </label>
-              <button className="button secondary">
-                <Plus size={16} />
-                เพิ่มคำถาม
-              </button>
-            </form>
+            <h2>{isLocked ? "คำถามในแบบประเมิน" : "เพิ่มคำถาม"}</h2>
+            {!isLocked && (
+              <form onSubmit={addQuestion} className="form-grid">
+                <label className="span-2">
+                  ข้อความคำถาม
+                  <input
+                    name="questionText"
+                    required
+                    placeholder="เช่น ท่านพึงพอใจต่อการให้บริการเพียงใด"
+                  />
+                </label>
+                <label>
+                  ประเภทคำถาม
+                  <select name="questionType">
+                    <option value="RATING">คะแนน 1–5</option>
+                    <option value="SINGLE_CHOICE">เลือกหนึ่งข้อ</option>
+                    <option value="MULTIPLE_CHOICE">เลือกได้หลายข้อ</option>
+                    <option value="SHORT_TEXT">ข้อความสั้น</option>
+                    <option value="LONG_TEXT">ข้อความยาว</option>
+                    <option value="NUMBER">ตัวเลข</option>
+                  </select>
+                </label>
+                <label className="check-label">
+                  <input name="required" type="checkbox" /> จำเป็นต้องตอบ
+                </label>
+                <label className="span-2">
+                  ตัวเลือก{" "}
+                  <small>(หนึ่งรายการต่อบรรทัด สำหรับคำถามแบบเลือก)</small>
+                  <textarea
+                    name="options"
+                    rows={3}
+                    placeholder={"ดีมาก\nปานกลาง\nน้อย"}
+                  />
+                </label>
+                <button className="button secondary">
+                  <Plus size={16} />
+                  เพิ่มคำถาม
+                </button>
+              </form>
+            )}
             <div className="question-list">
               {questions.map((q, i) => (
                 <div className="question-row" key={q.id}>
@@ -811,32 +912,36 @@ function AssessmentEditor() {
                       {q.questionType} {q.isRequired ? "· จำเป็น" : ""}
                     </small>
                   </span>
-                  <button
-                    className="quiet"
-                    onClick={async () => {
-                      try {
-                        await api.delete(`/questions/${q.id}`);
-                        setQuestions(questions.filter((_, n) => n !== i));
-                      } catch (e: any) {
-                        setMessage(
-                          e.response?.data?.error?.message ||
-                            "ลบคำถามไม่สำเร็จ",
-                        );
-                      }
-                    }}
-                  >
-                    ลบ
-                  </button>
+                  {!isLocked && (
+                    <button
+                      className="quiet"
+                      onClick={async () => {
+                        try {
+                          await api.delete(`/questions/${q.id}`);
+                          setQuestions(questions.filter((_, n) => n !== i));
+                        } catch (e: any) {
+                          setMessage(
+                            e.response?.data?.error?.message ||
+                              "ลบคำถามไม่สำเร็จ",
+                          );
+                        }
+                      }}
+                    >
+                      ลบ
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
-            <button
-              className="button primary full"
-              disabled={!questions.length || assessment.status === "PUBLISHED"}
-              onClick={publish}
-            >
-              เผยแพร่แบบประเมิน
-            </button>
+            {assessment.status === "DRAFT" && (
+              <button
+                className="button primary full"
+                disabled={!questions.length}
+                onClick={publish}
+              >
+                เผยแพร่แบบประเมิน
+              </button>
+            )}
           </div>
         )}
         {qrUrl && (

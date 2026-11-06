@@ -1219,6 +1219,78 @@ td b {
     gap: 8px;
   }
 }
+.assessment-guide,
+.assessment-lock-notice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border: 1px solid #dceaf3;
+  border-radius: 9px;
+  background: #f1f8fc;
+}
+.assessment-guide {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 3px;
+}
+.assessment-guide b,
+.assessment-lock-notice b {
+  color: #2c5775;
+  font-size: 11px;
+}
+.assessment-guide span,
+.assessment-lock-notice span {
+  color: #58758a;
+  font-size: 10px;
+}
+.assessment-guide small {
+  color: #899ba8;
+  font-size: 9px;
+}
+.assessment-lock-notice {
+  justify-content: space-between;
+  border-color: #f0e3cb;
+  background: #fffaf1;
+}
+.assessment-lock-notice > div {
+  display: grid;
+  gap: 4px;
+}
+.assessment-lock-notice b {
+  color: #85672f;
+}
+.assessment-lock-notice span {
+  color: #8b7b5b;
+}
+.assessment-actions {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  white-space: nowrap;
+}
+.text-action-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #66869d;
+  font: inherit;
+  font-size: 10px;
+}
+.text-action-button:hover {
+  color: #1e6b9c;
+  text-decoration: underline;
+}
+.assessment-lock-notice .button {
+  flex-shrink: 0;
+}
+@media (max-width: 760px) {
+  .assessment-lock-notice {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
 @media print {
   .sidebar,
   .topbar,
