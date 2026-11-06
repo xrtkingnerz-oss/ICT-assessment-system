@@ -1316,15 +1316,18 @@ td b {
   display: flex;
   align-items: center;
   gap: 10px;
+  max-width: 900px;
   margin-bottom: 16px;
   flex-wrap: wrap;
 }
 .user-toolbar .searchbox {
-  flex: 1 1 240px;
+  flex: 0 1 340px;
+  min-width: 220px;
   width: auto;
 }
 .user-toolbar select {
-  min-width: 145px;
+  width: 160px;
+  min-width: 0;
   height: 36px;
   padding: 0 10px;
   border: 1px solid #e1e7ec;
@@ -1513,17 +1516,22 @@ td b {
 }
 @media (max-width: 760px) {
   .user-toolbar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: stretch;
   }
   .user-toolbar .searchbox {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
+    min-width: 0;
+    width: 100%;
+    max-width: none;
   }
   .user-toolbar select {
-    flex: 1;
+    width: 100%;
     min-width: 0;
   }
   .user-result-count {
-    flex-basis: 100%;
+    grid-column: 1 / -1;
     margin-left: 0;
   }
 }
