@@ -32,7 +32,8 @@
 .brand b {
   display: block;
   font:
-    700 14px Manrope,
+    700 14px "TH SarabunPSK",
+    Sarabun,
     sans-serif;
   letter-spacing: -0.2px;
 }
@@ -45,7 +46,8 @@
 .nav-label,
 .eyebrow {
   font:
-    700 10px Manrope,
+    700 10px "TH SarabunPSK",
+    Sarabun,
     sans-serif;
   letter-spacing: 1.4px;
   color: #8b9bad;
@@ -315,13 +317,17 @@
 }
 .stat-value {
   font:
-    800 24px Manrope,
+    800 24px "TH SarabunPSK",
+    Sarabun,
     sans-serif;
   color: #203d57;
   margin-top: 3px;
 }
 .stat-value small {
-  font: 400 11px "IBM Plex Sans Thai";
+  font:
+    400 11px "TH SarabunPSK",
+    Sarabun,
+    sans-serif;
   color: #91a0ad;
   margin-left: 6px;
 }
@@ -371,7 +377,8 @@
 }
 .tag {
   font:
-    700 8px Manrope,
+    700 8px "TH SarabunPSK",
+    Sarabun,
     sans-serif;
   letter-spacing: 0.8px;
   color: #4c9b79;
@@ -398,7 +405,10 @@
   pointer-events: none;
 }
 .pie-center b {
-  font: 800 21px Manrope;
+  font:
+    800 21px "TH SarabunPSK",
+    Sarabun,
+    sans-serif;
   color: #24425d;
 }
 .pie-center small {
@@ -640,7 +650,10 @@ td b {
   color: #455c70;
 }
 .question-row > b {
-  font: 700 10px Manrope;
+  font:
+    700 10px "TH SarabunPSK",
+    Sarabun,
+    sans-serif;
   color: #6d92ad;
   padding-top: 2px;
 }
@@ -1509,12 +1522,20 @@ td b {
 }
 .app-shell {
   background:
-    radial-gradient(ellipse at 88% 0%, rgba(77, 173, 216, 0.09), transparent 34rem),
+    radial-gradient(
+      ellipse at 88% 0%,
+      rgba(77, 173, 216, 0.09),
+      transparent 34rem
+    ),
     #f3f7fa;
 }
 .sidebar {
   background:
-    radial-gradient(ellipse at 8% 0%, rgba(68, 165, 207, 0.22), transparent 17rem),
+    radial-gradient(
+      ellipse at 8% 0%,
+      rgba(68, 165, 207, 0.22),
+      transparent 17rem
+    ),
     linear-gradient(165deg, #12385f 0%, #102c4b 58%, #102943 100%);
   box-shadow: 8px 0 28px rgba(13, 38, 63, 0.08);
 }
@@ -1530,7 +1551,9 @@ td b {
   border: 1px solid rgba(255, 255, 255, 0.24);
   border-radius: 14px;
   background: linear-gradient(145deg, #43b6db, #1876b8 72%);
-  box-shadow: 0 7px 18px rgba(12, 24, 43, 0.22), inset 0 1px rgba(255, 255, 255, 0.25);
+  box-shadow:
+    0 7px 18px rgba(12, 24, 43, 0.22),
+    inset 0 1px rgba(255, 255, 255, 0.25);
 }
 .brand b {
   font-size: 13px;
@@ -1559,7 +1582,11 @@ td b {
 }
 .sidebar nav a.active {
   border-color: rgba(143, 216, 239, 0.18);
-  background: linear-gradient(100deg, rgba(61, 161, 207, 0.3), rgba(40, 107, 156, 0.18));
+  background: linear-gradient(
+    100deg,
+    rgba(61, 161, 207, 0.3),
+    rgba(40, 107, 156, 0.18)
+  );
   color: #fff;
   box-shadow: inset 3px 0 #57c1dd;
 }
@@ -1576,7 +1603,9 @@ td b {
 .profile-mini {
   border: 1px solid rgba(205, 228, 245, 0.1);
   background: rgba(224, 240, 251, 0.08);
-  transition: background 0.18s, border-color 0.18s;
+  transition:
+    background 0.18s,
+    border-color 0.18s;
 }
 .profile-mini:hover {
   border-color: rgba(205, 228, 245, 0.2);
@@ -1639,7 +1668,10 @@ td b {
   box-shadow: var(--kkict-shadow);
 }
 .stat-card {
-  transition: border-color 0.18s, box-shadow 0.18s, transform 0.18s;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s,
+    transform 0.18s;
 }
 .stat-card:hover {
   border-color: #c8dce9;
@@ -1688,11 +1720,19 @@ td b {
 }
 .login-aside {
   background:
-    radial-gradient(ellipse at 82% 20%, rgba(61, 174, 210, 0.3), transparent 22rem),
+    radial-gradient(
+      ellipse at 82% 20%,
+      rgba(61, 174, 210, 0.3),
+      transparent 22rem
+    ),
     linear-gradient(145deg, #174b78 0%, #12365d 53%, #102b49 100%);
 }
 .login-aside::after {
-  background: linear-gradient(135deg, rgba(85, 181, 138, 0.18), rgba(56, 169, 214, 0.08));
+  background: linear-gradient(
+    135deg,
+    rgba(85, 181, 138, 0.18),
+    rgba(56, 169, 214, 0.08)
+  );
 }
 .login-decoration div {
   border-color: rgba(172, 225, 240, 0.2);
@@ -1706,7 +1746,11 @@ td b {
 }
 .public-page {
   background:
-    radial-gradient(ellipse at 88% 4%, rgba(56, 169, 214, 0.12), transparent 28rem),
+    radial-gradient(
+      ellipse at 88% 4%,
+      rgba(56, 169, 214, 0.12),
+      transparent 28rem
+    ),
     #f1f6f9;
 }
 .public-card,
