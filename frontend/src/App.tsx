@@ -1441,15 +1441,32 @@ function CategoriesPage({ user }: { user: User }) {
     setIsSaving(true);
     setMessage("");
     try {
-      await api.post("/categories", { name, description: description || null });
+      const response = await api.post("/categories", {
+        name,
+        description: description || null,
+      });
+      const created = response.data.data as Category;
+      setItems((current) =>
+        [...current, { ...created, _count: { assessments: 0 } }].sort((a, b) =>
+          a.name.localeCompare(b.name, "th"),
+        ),
+      );
       form.reset();
       setMessage("เพิ่มหมวดหมู่แล้ว");
       setMessageType("success");
-      await load();
     } catch (error: any) {
+      const status = error.response?.status;
+      const serverMessage = error.response?.data?.error?.message;
       setMessage(
-        error.response?.data?.error?.message ||
-          "เพิ่มหมวดหมู่ไม่สำเร็จ กรุณาลองอีกครั้ง",
+        status === 401
+          ? "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่แล้วลองอีกครั้ง"
+          : status === 403
+            ? "บัญชีนี้ไม่มีสิทธิ์เพิ่มหมวดหมู่ กรุณาเข้าสู่ระบบด้วยบัญชี Admin"
+            : status === 409
+              ? serverMessage || "หมวดหมู่นี้มีอยู่แล้ว"
+              : !error.response
+                ? "เชื่อมต่อระบบไม่ได้ กรุณาตรวจว่า backend กำลังทำงานอยู่"
+                : serverMessage || "เพิ่มหมวดหมู่ไม่สำเร็จ กรุณาลองอีกครั้ง",
       );
       setMessageType("error");
     } finally {
