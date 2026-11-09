@@ -138,7 +138,7 @@ function Guard() {
         <Route path="/assessments/new" element={<AssessmentEditor />} />
         <Route path="/assessments/:id" element={<AssessmentEditor />} />
         <Route path="/users" element={<UsersPage />} />
-        <Route path="/categories" element={<CategoriesPage />} />
+        <Route path="/categories" element={<CategoriesPage user={user} />} />
         <Route path="/reports" element={<ReportsPage />} />
         <Route path="/profile" element={<ProfilePage user={user} />} />
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -1396,13 +1396,67 @@ function UsersPage() {
     </section>
   );
 }
-function CategoriesPage() {
+function CategoriesPage({ user }: { user: User }) {
   const [items, setItems] = useState<Category[]>([]);
   const [message, setMessage] = useState("");
-  const load = () => api.get("/categories").then((r) => setItems(r.data.data));
+  const [messageType, setMessageType] = useState<"success" | "error" | "info">(
+    "info",
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const canManageCategories = user.role === "ADMIN";
+
+  const load = async () => {
+    try {
+      const response = await api.get("/categories");
+      setItems(response.data.data);
+    } catch (error: any) {
+      setMessage(
+        error.response?.data?.error?.message || "โหลดหมวดหมู่ไม่สำเร็จ",
+      );
+      setMessageType("error");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    load();
+    void load();
   }, []);
+
+  async function saveCategory(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!canManageCategories || isSaving) return;
+
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const name = String(formData.get("name") || "").trim();
+    const description = String(formData.get("description") || "").trim();
+    if (!name) {
+      setMessage("กรุณากรอกชื่อหมวดหมู่");
+      setMessageType("error");
+      return;
+    }
+
+    setIsSaving(true);
+    setMessage("");
+    try {
+      await api.post("/categories", { name, description: description || null });
+      form.reset();
+      setMessage("เพิ่มหมวดหมู่แล้ว");
+      setMessageType("success");
+      await load();
+    } catch (error: any) {
+      setMessage(
+        error.response?.data?.error?.message ||
+          "เพิ่มหมวดหมู่ไม่สำเร็จ กรุณาลองอีกครั้ง",
+      );
+      setMessageType("error");
+    } finally {
+      setIsSaving(false);
+    }
+  }
+
   return (
     <section className="content">
       <PageHeader
@@ -1410,33 +1464,46 @@ function CategoriesPage() {
         subtitle="จัดกลุ่มแบบประเมินให้ค้นหาและรายงานได้ง่าย"
       />
       <div className="panel form-panel">
-        <form
-          className="inline-form"
-          onSubmit={async (e) => {
-            e.preventDefault();
-            const form = e.currentTarget;
-            const f = new FormData(form);
-            try {
-              await api.post("/categories", {
-                name: f.get("name"),
-                description: f.get("description"),
-              });
-              setMessage("เพิ่มหมวดหมู่แล้ว");
-              form.reset();
-              load();
-            } catch (x: any) {
-              setMessage(x.response?.data?.error?.message || "เพิ่มไม่สำเร็จ");
-            }
-          }}
-        >
-          <input name="name" placeholder="ชื่อหมวดหมู่ใหม่" required />
-          <input name="description" placeholder="คำอธิบาย (ไม่บังคับ)" />
-          <button className="button primary">
-            <Plus size={16} />
-            เพิ่มหมวดหมู่
-          </button>
-        </form>
-        {message && <div className="alert info">{message}</div>}
+        {canManageCategories ? (
+          <form className="inline-form" onSubmit={saveCategory}>
+            <input
+              name="name"
+              placeholder="ชื่อหมวดหมู่ใหม่"
+              aria-label="ชื่อหมวดหมู่ใหม่"
+              maxLength={150}
+              required
+              disabled={isSaving}
+            />
+            <input
+              name="description"
+              placeholder="คำอธิบาย (ไม่บังคับ)"
+              aria-label="คำอธิบายหมวดหมู่"
+              disabled={isSaving}
+            />
+            <button
+              className="button primary"
+              type="submit"
+              disabled={isSaving}
+            >
+              <Plus size={16} />
+              {isSaving ? "กำลังบันทึก…" : "เพิ่มหมวดหมู่"}
+            </button>
+          </form>
+        ) : (
+          <div className="alert info">
+            หน้านี้ใช้จัดการหมวดหมู่ ผู้ดูแลระบบ (Admin)
+            เท่านั้นที่เพิ่มหรือแก้ไขได้
+          </div>
+        )}
+        {message && (
+          <div
+            className={`alert ${messageType}`}
+            role="status"
+            aria-live="polite"
+          >
+            {message}
+          </div>
+        )}
         <div className="table-wrap">
           <table>
             <thead>
@@ -1446,12 +1513,26 @@ function CategoriesPage() {
               </tr>
             </thead>
             <tbody>
-              {items.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.name}</td>
-                  <td>{c._count?.assessments || 0} รายการ</td>
+              {isLoading ? (
+                <tr>
+                  <td colSpan={2} className="users-state-cell">
+                    กำลังโหลดหมวดหมู่…
+                  </td>
                 </tr>
-              ))}
+              ) : items.length ? (
+                items.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name}</td>
+                    <td>{c._count?.assessments || 0} รายการ</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={2} className="users-state-cell">
+                    ยังไม่มีหมวดหมู่
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
