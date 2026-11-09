@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import {
   BrowserRouter,
   Link,
+  NavLink,
   Navigate,
   Route,
   Routes,
@@ -182,10 +183,15 @@ function Shell({
         <div className="nav-label">WORKSPACE</div>
         <nav>
           {links.map(({ to, label, icon: Icon }) => (
-            <Link key={to} to={to} onClick={() => setOpen(false)}>
+            <NavLink
+              key={to}
+              to={to}
+              end={to === "/"}
+              onClick={() => setOpen(false)}
+            >
               <Icon size={18} />
               <span>{label}</span>
-            </Link>
+            </NavLink>
           ))}
         </nav>
         <div className="sidebar-bottom">
