@@ -365,13 +365,13 @@ function Dashboard() {
                   dataKey="date"
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11, fill: "#8592a3" }}
+                  tick={{ fontSize: 12, fill: "#8592a3" }}
                 />
                 <YAxis
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
-                  tick={{ fontSize: 11, fill: "#8592a3" }}
+                  tick={{ fontSize: 12, fill: "#8592a3" }}
                 />
                 <Tooltip />
                 <Line

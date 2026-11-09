@@ -1798,3 +1798,131 @@ td b {
     margin-left: 0;
   }
 }
+
+/* Comfortable reading scale for Sarabun, including dense admin screens. */
+.sidebar nav a {
+  font-size: 14px;
+}
+.nav-label,
+.eyebrow {
+  font-size: 12px;
+}
+.brand small,
+.profile-mini small,
+.top-user small,
+.crumb {
+  font-size: 12px;
+}
+.profile-mini b,
+.top-user b {
+  font-size: 13px;
+}
+.page-header h1 {
+  font-size: 26px;
+}
+.page-header p {
+  font-size: 14px;
+}
+.button {
+  font-size: 14px;
+}
+.stat-title {
+  font-size: 13px;
+}
+.stat-value {
+  font-size: 26px;
+}
+.stat-value small,
+.stat-foot,
+.panel-head p,
+.panel-head > a,
+.legend,
+.table-sub,
+.status,
+.searchbox input,
+.muted,
+.text-action,
+.empty,
+.alert,
+.form-grid label,
+.public-card label,
+.login-card label,
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.form-panel input,
+.form-panel select,
+.public-card input,
+.public-card select,
+.public-card textarea,
+.inline-form input,
+.inline-form select,
+.qr-panel p,
+.loading,
+.login-card > p,
+.login-help,
+.public-link,
+.public-brand,
+.public-card > p,
+.choice-list label,
+.assessment-guide b,
+.assessment-lock-notice b,
+.assessment-guide span,
+.assessment-lock-notice span,
+.user-toolbar select,
+.role-label,
+.user-state,
+.user-form > label:not(.user-active-toggle),
+.user-active-toggle,
+.user-form input:not([type="checkbox"]),
+.user-form select {
+  font-size: 13px;
+}
+.stat-value small,
+.table-sub,
+.assessment-guide small,
+.field-error,
+.pagination-bar,
+.user-result-count,
+.pie-center small {
+  font-size: 12px;
+}
+.panel-head h2,
+.form-panel h2,
+.qr-panel h2 {
+  font-size: 16px;
+}
+.tag,
+th,
+.table-wrap table,
+.form-grid small,
+.question-row small,
+.quiet,
+.narrow h3,
+.text-action-button {
+  font-size: 12px;
+}
+.question-row {
+  font-size: 13px;
+}
+.question-row > b {
+  font-size: 12px;
+}
+.login-card h2 {
+  font-size: 27px;
+}
+.public-card h1 {
+  font-size: 27px;
+}
+.public-fields label,
+.public-question > label {
+  font-size: 14px;
+}
+.public-card .eyebrow,
+.login-card .eyebrow,
+.copyright {
+  font-size: 12px;
+}
+.pagination-bar .button {
+  font-size: 12px;
+}
