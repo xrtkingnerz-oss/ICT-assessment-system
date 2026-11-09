@@ -2093,38 +2093,47 @@ function PublicForm() {
     );
   return (
     <div className="public-page">
-      <form className="public-card" onSubmit={submit}>
-        <div className="public-brand">
-          <div className="brand-icon">
-            <Activity />
+      <form className="public-form" onSubmit={submit}>
+        <section className="public-form-card public-form-heading-card">
+          <div className="public-brand">
+            <div className="brand-icon">
+              <Activity />
+            </div>
+            <span>ศูนย์ ICT ขอนแก่น</span>
           </div>
-          <span>ศูนย์ ICT ขอนแก่น</span>
-        </div>
-        <div className="eyebrow">แบบประเมินออนไลน์</div>
-        <h1>{survey.title}</h1>
-        <p>
-          {survey.description ||
-            "ความคิดเห็นของท่านมีส่วนสำคัญในการพัฒนาบริการ"}
-        </p>
-        <div className="public-fields">
-          <label>
-            ประเภทผู้ตอบ
-            <select name="respondentType" required>
-              <option value="INTERNAL">บุคลากรภายใน</option>
-              <option value="EXTERNAL">บุคคลภายนอก</option>
-            </select>
-          </label>
-          <label>
-            ชื่อ (ไม่บังคับ)
-            <input name="name" placeholder="ไม่ระบุชื่อได้" />
-          </label>
-          <label>
-            อีเมล (ไม่บังคับ)
-            <input name="email" type="email" placeholder="name@example.com" />
-          </label>
-        </div>
+          <div className="eyebrow">แบบประเมินออนไลน์</div>
+          <h1>{survey.title}</h1>
+          <p>
+            {survey.description ||
+              "ความคิดเห็นของท่านมีส่วนสำคัญในการพัฒนาบริการ"}
+          </p>
+          <div className="public-required-note">
+            <em>*</em> ระบุว่าเป็นคำถามที่จำเป็นต้องตอบ
+          </div>
+        </section>
+
+        <section className="public-form-card respondent-card">
+          <h2>ข้อมูลผู้ตอบแบบประเมิน</h2>
+          <div className="public-fields">
+            <label>
+              ประเภทผู้ตอบ <em>*</em>
+              <select name="respondentType" required>
+                <option value="INTERNAL">บุคลากรภายใน</option>
+                <option value="EXTERNAL">บุคคลภายนอก</option>
+              </select>
+            </label>
+            <label>
+              ชื่อ <small>(ไม่บังคับ)</small>
+              <input name="name" placeholder="ไม่ระบุชื่อได้" />
+            </label>
+            <label>
+              อีเมล <small>(ไม่บังคับ)</small>
+              <input name="email" type="email" placeholder="name@example.com" />
+            </label>
+          </div>
+        </section>
         {survey.questions.map((q: any, i: number) => (
-          <div className="public-question" key={q.id}>
+          <section className="public-form-card public-question" key={q.id}>
             <label>
               <b>
                 {i + 1}. {q.text}
@@ -2136,19 +2145,25 @@ function PublicForm() {
             ) : q.type === "LONG_TEXT" ? (
               <textarea name={`q-${q.id}`} rows={4} required={q.required} />
             ) : q.type === "RATING" ? (
-              <div className="rating-options">
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <label key={n}>
-                    <input
-                      type="radio"
-                      name={`q-${q.id}`}
-                      value={n}
-                      required={q.required}
-                    />
-                    <span>{n}</span>
-                  </label>
-                ))}
-              </div>
+              <>
+                <div className="rating-options">
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <label key={n}>
+                      <input
+                        type="radio"
+                        name={`q-${q.id}`}
+                        value={n}
+                        required={q.required}
+                      />
+                      <span>{n}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="rating-scale-caption">
+                  <span>น้อยที่สุด</span>
+                  <span>มากที่สุด</span>
+                </div>
+              </>
             ) : q.type === "NUMBER" ? (
               <input name={`q-${q.id}`} type="number" required={q.required} />
             ) : (
@@ -2166,14 +2181,16 @@ function PublicForm() {
                 ))}
               </div>
             )}
-          </div>
+          </section>
         ))}
-        {error && <div className="alert error">{error}</div>}
-        <button className="button primary full">ส่งคำตอบ</button>
-        <small className="privacy-note">
-          <ShieldCheck size={14} />
-          ระบบใช้ข้อมูลเพื่อการประเมินและรักษาความเป็นส่วนตัว
-        </small>
+        <section className="public-form-footer-card">
+          {error && <div className="alert error">{error}</div>}
+          <button className="button primary">ส่งคำตอบ</button>
+          <small className="privacy-note">
+            <ShieldCheck size={15} />
+            ระบบใช้ข้อมูลเพื่อการประเมินและรักษาความเป็นส่วนตัว
+          </small>
+        </section>
       </form>
     </div>
   );
