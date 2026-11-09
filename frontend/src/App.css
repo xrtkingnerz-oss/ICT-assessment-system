@@ -1514,6 +1514,55 @@ td b {
   gap: 8px;
   padding-top: 6px;
 }
+.category-table {
+  min-width: 680px;
+}
+.category-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 180px;
+}
+.category-name-cell b {
+  color: #244967;
+  font-weight: 600;
+}
+.category-symbol {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border: 1px solid #dcecf3;
+  border-radius: 10px;
+  background: linear-gradient(145deg, #effaff, #e7f5f0);
+  color: #2983a5;
+}
+.category-description {
+  max-width: 430px;
+  color: #71879a;
+}
+.category-modal textarea {
+  width: 100%;
+  min-height: 110px;
+  padding: 10px 12px;
+  border: 1px solid #dfe6ec;
+  border-radius: 9px;
+  background: #fff;
+  color: #334c61;
+  font: inherit;
+  resize: vertical;
+}
+.category-modal textarea:focus {
+  border-color: #56a9c8;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(56, 169, 214, 0.14);
+}
+.alert.success {
+  border: 1px solid #cae9d9;
+  background: #edf9f2;
+  color: #317a57;
+}
 
 /* KKICT visual identity: civic blue, clear cyan, and a small learning-green accent. */
 :root {

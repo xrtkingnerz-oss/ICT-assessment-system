@@ -84,7 +84,12 @@ type Question = {
   isRequired: boolean;
   options: { id?: string; optionText: string; score: number }[];
 };
-type Category = { id: string; name: string; _count?: { assessments: number } };
+type Category = {
+  id: string;
+  name: string;
+  description?: string | null;
+  _count?: { assessments: number };
+};
 const loginSchema = z.object({
   email: z.string().email("กรุณากรอกอีเมลให้ถูกต้อง"),
   password: z.string().min(1, "กรุณากรอกรหัสผ่าน"),
@@ -1398,13 +1403,22 @@ function UsersPage() {
 }
 function CategoriesPage({ user }: { user: User }) {
   const [items, setItems] = useState<Category[]>([]);
+  const [search, setSearch] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<"success" | "error" | "info">(
     "info",
   );
+  const [formError, setFormError] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const canManageCategories = user.role === "ADMIN";
+  const filteredItems = items.filter((category) =>
+    `${category.name} ${category.description || ""}`
+      .toLocaleLowerCase("th")
+      .includes(search.trim().toLocaleLowerCase("th")),
+  );
 
   const load = async () => {
     try {
@@ -1424,6 +1438,18 @@ function CategoriesPage({ user }: { user: User }) {
     void load();
   }, []);
 
+  function openCreateModal() {
+    setEditingCategory(null);
+    setFormError("");
+    setModalOpen(true);
+  }
+
+  function openEditModal(category: Category) {
+    setEditingCategory(category);
+    setFormError("");
+    setModalOpen(true);
+  }
+
   async function saveCategory(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canManageCategories || isSaving) return;
@@ -1439,25 +1465,44 @@ function CategoriesPage({ user }: { user: User }) {
     }
 
     setIsSaving(true);
-    setMessage("");
+    setFormError("");
     try {
-      const response = await api.post("/categories", {
+      const payload = {
         name,
         description: description || null,
-      });
-      const created = response.data.data as Category;
-      setItems((current) =>
-        [...current, { ...created, _count: { assessments: 0 } }].sort((a, b) =>
-          a.name.localeCompare(b.name, "th"),
-        ),
-      );
-      form.reset();
-      setMessage("เพิ่มหมวดหมู่แล้ว");
+      };
+      if (editingCategory) {
+        const response = await api.put(
+          `/categories/${editingCategory.id}`,
+          payload,
+        );
+        const updated = response.data.data as Category;
+        setItems((current) =>
+          current
+            .map((category) =>
+              category.id === updated.id
+                ? { ...category, ...updated }
+                : category,
+            )
+            .sort((a, b) => a.name.localeCompare(b.name, "th")),
+        );
+        setMessage("บันทึกการแก้ไขหมวดหมู่แล้ว");
+      } else {
+        const response = await api.post("/categories", payload);
+        const created = response.data.data as Category;
+        setItems((current) =>
+          [...current, { ...created, _count: { assessments: 0 } }].sort(
+            (a, b) => a.name.localeCompare(b.name, "th"),
+          ),
+        );
+        setMessage("เพิ่มหมวดหมู่แล้ว");
+      }
       setMessageType("success");
+      setModalOpen(false);
     } catch (error: any) {
       const status = error.response?.status;
       const serverMessage = error.response?.data?.error?.message;
-      setMessage(
+      setFormError(
         status === 401
           ? "เซสชันหมดอายุ กรุณาเข้าสู่ระบบใหม่แล้วลองอีกครั้ง"
           : status === 403
@@ -1468,9 +1513,21 @@ function CategoriesPage({ user }: { user: User }) {
                 ? "เชื่อมต่อระบบไม่ได้ กรุณาตรวจว่า backend กำลังทำงานอยู่"
                 : serverMessage || "เพิ่มหมวดหมู่ไม่สำเร็จ กรุณาลองอีกครั้ง",
       );
-      setMessageType("error");
     } finally {
       setIsSaving(false);
+    }
+  }
+
+  async function deleteCategory(category: Category) {
+    if (!window.confirm(`ลบหมวดหมู่ “${category.name}” หรือไม่?`)) return;
+    try {
+      await api.delete(`/categories/${category.id}`);
+      setItems((current) => current.filter((item) => item.id !== category.id));
+      setMessage(`ลบหมวดหมู่ “${category.name}” แล้ว`);
+      setMessageType("success");
+    } catch (error: any) {
+      setMessage(error.response?.data?.error?.message || "ลบหมวดหมู่ไม่สำเร็จ");
+      setMessageType("error");
     }
   }
 
@@ -1479,39 +1536,35 @@ function CategoriesPage({ user }: { user: User }) {
       <PageHeader
         title="หมวดหมู่"
         subtitle="จัดกลุ่มแบบประเมินให้ค้นหาและรายงานได้ง่าย"
+        action={
+          canManageCategories ? (
+            <button className="button primary" onClick={openCreateModal}>
+              <Plus size={17} /> เพิ่มหมวดหมู่
+            </button>
+          ) : undefined
+        }
       />
       <div className="panel form-panel">
-        {canManageCategories ? (
-          <form className="inline-form" onSubmit={saveCategory}>
-            <input
-              name="name"
-              placeholder="ชื่อหมวดหมู่ใหม่"
-              aria-label="ชื่อหมวดหมู่ใหม่"
-              maxLength={150}
-              required
-              disabled={isSaving}
-            />
-            <input
-              name="description"
-              placeholder="คำอธิบาย (ไม่บังคับ)"
-              aria-label="คำอธิบายหมวดหมู่"
-              disabled={isSaving}
-            />
-            <button
-              className="button primary"
-              type="submit"
-              disabled={isSaving}
-            >
-              <Plus size={16} />
-              {isSaving ? "กำลังบันทึก…" : "เพิ่มหมวดหมู่"}
-            </button>
-          </form>
-        ) : (
+        {!canManageCategories && (
           <div className="alert info">
             หน้านี้ใช้จัดการหมวดหมู่ ผู้ดูแลระบบ (Admin)
             เท่านั้นที่เพิ่มหรือแก้ไขได้
           </div>
         )}
+        <div className="user-toolbar">
+          <label className="searchbox">
+            <Search size={18} />
+            <input
+              placeholder="ค้นหาชื่อหรือคำอธิบายหมวดหมู่"
+              aria-label="ค้นหาหมวดหมู่"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+            />
+          </label>
+          <span className="user-result-count">
+            ทั้งหมด {items.length} หมวดหมู่
+          </span>
+        </div>
         {message && (
           <div
             className={`alert ${messageType}`}
@@ -1522,31 +1575,71 @@ function CategoriesPage({ user }: { user: User }) {
           </div>
         )}
         <div className="table-wrap">
-          <table>
+          <table className="category-table">
             <thead>
               <tr>
                 <th>ชื่อหมวดหมู่</th>
+                <th>คำอธิบาย</th>
                 <th>แบบประเมิน</th>
+                {canManageCategories && <th>จัดการ</th>}
               </tr>
             </thead>
             <tbody>
               {isLoading ? (
                 <tr>
-                  <td colSpan={2} className="users-state-cell">
+                  <td
+                    colSpan={canManageCategories ? 4 : 3}
+                    className="users-state-cell"
+                  >
                     กำลังโหลดหมวดหมู่…
                   </td>
                 </tr>
-              ) : items.length ? (
-                items.map((c) => (
+              ) : filteredItems.length ? (
+                filteredItems.map((c) => (
                   <tr key={c.id}>
-                    <td>{c.name}</td>
+                    <td>
+                      <div className="category-name-cell">
+                        <span className="category-symbol">
+                          <FolderKanban size={17} />
+                        </span>
+                        <b>{c.name}</b>
+                      </div>
+                    </td>
+                    <td className="category-description">
+                      {c.description || "—"}
+                    </td>
                     <td>{c._count?.assessments || 0} รายการ</td>
+                    {canManageCategories && (
+                      <td>
+                        <div className="user-actions">
+                          <button
+                            className="icon-action"
+                            title="แก้ไขหมวดหมู่"
+                            aria-label={`แก้ไขหมวดหมู่ ${c.name}`}
+                            onClick={() => openEditModal(c)}
+                          >
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className="icon-action danger"
+                            title="ลบหมวดหมู่"
+                            aria-label={`ลบหมวดหมู่ ${c.name}`}
+                            onClick={() => void deleteCategory(c)}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={2} className="users-state-cell">
-                    ยังไม่มีหมวดหมู่
+                  <td
+                    colSpan={canManageCategories ? 4 : 3}
+                    className="users-state-cell"
+                  >
+                    {search ? "ไม่พบหมวดหมู่ตามคำค้น" : "ยังไม่มีหมวดหมู่"}
                   </td>
                 </tr>
               )}
@@ -1554,6 +1647,91 @@ function CategoriesPage({ user }: { user: User }) {
           </table>
         </div>
       </div>
+
+      {modalOpen && (
+        <div
+          className="modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isSaving)
+              setModalOpen(false);
+          }}
+        >
+          <section
+            className="user-modal category-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="category-modal-title"
+          >
+            <div className="modal-heading">
+              <div>
+                <div className="eyebrow">CATEGORY MANAGEMENT</div>
+                <h2 id="category-modal-title">
+                  {editingCategory ? "แก้ไขหมวดหมู่" : "เพิ่มหมวดหมู่ใหม่"}
+                </h2>
+              </div>
+              <button
+                className="icon-action"
+                type="button"
+                aria-label="ปิดหน้าต่าง"
+                disabled={isSaving}
+                onClick={() => setModalOpen(false)}
+              >
+                <X size={19} />
+              </button>
+            </div>
+            <form
+              key={editingCategory?.id || "new-category"}
+              className="user-form"
+              onSubmit={saveCategory}
+            >
+              <label>
+                ชื่อหมวดหมู่
+                <input
+                  name="name"
+                  required
+                  maxLength={150}
+                  defaultValue={editingCategory?.name || ""}
+                  placeholder="เช่น การให้บริการและสิ่งอำนวยความสะดวก"
+                  autoFocus
+                  disabled={isSaving}
+                />
+              </label>
+              <label>
+                คำอธิบาย
+                <textarea
+                  name="description"
+                  rows={4}
+                  defaultValue={editingCategory?.description || ""}
+                  placeholder="ระบุรายละเอียดเพิ่มเติม (ไม่บังคับ)"
+                  disabled={isSaving}
+                />
+              </label>
+              {formError && <div className="alert error">{formError}</div>}
+              <div className="modal-actions">
+                <button
+                  className="button outline"
+                  type="button"
+                  disabled={isSaving}
+                  onClick={() => setModalOpen(false)}
+                >
+                  ยกเลิก
+                </button>
+                <button
+                  className="button primary"
+                  type="submit"
+                  disabled={isSaving}
+                >
+                  {isSaving
+                    ? "กำลังบันทึก…"
+                    : editingCategory
+                      ? "บันทึกการแก้ไข"
+                      : "เพิ่มหมวดหมู่"}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
+      )}
     </section>
   );
 }
