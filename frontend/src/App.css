@@ -1799,38 +1799,59 @@ td b {
   }
 }
 
-/* Comfortable reading scale for Sarabun, including dense admin screens. */
+/* Clear, comfortable Sarabun typography with a little extra visual polish. */
 .sidebar nav a {
-  font-size: 15px;
+  min-height: 47px;
+  font-size: 16px;
 }
 .nav-label,
-.eyebrow {
-  font-size: 13px;
-}
+.eyebrow,
 .brand small,
 .profile-mini small,
 .top-user small,
-.crumb {
-  font-size: 13px;
+.security-note,
+.crumb,
+.public-card .eyebrow,
+.login-card .eyebrow,
+.copyright {
+  font-size: 14px;
 }
 .profile-mini b,
 .top-user b {
-  font-size: 14px;
-}
-.page-header h1 {
-  font-size: 26px;
-}
-.page-header p {
-  font-size: 14px;
-}
-.button {
   font-size: 15px;
 }
+.brand b {
+  font-size: 17px;
+}
+.page-header {
+  padding-bottom: 22px;
+}
+.page-header h1 {
+  font-size: 30px;
+  line-height: 1.35;
+}
+.page-header p {
+  font-size: 16px;
+  line-height: 1.55;
+}
+.login-message p {
+  font-size: 16px;
+  line-height: 1.75;
+}
+.button {
+  min-height: 42px;
+  font-size: 16px;
+}
+.stat-card {
+  padding: 19px 20px 17px;
+  min-height: 154px;
+}
 .stat-title {
-  font-size: 14px;
+  font-size: 15px;
 }
 .stat-value {
-  font-size: 27px;
+  font-size: 30px;
+  line-height: 1.2;
 }
 .stat-value small,
 .stat-foot,
@@ -1875,8 +1896,9 @@ td b {
 .user-form > label:not(.user-active-toggle),
 .user-active-toggle,
 .user-form input:not([type="checkbox"]),
-.user-form select {
-  font-size: 14px;
+.user-form select,
+.question-row {
+  font-size: 16px;
 }
 .stat-value small,
 .table-sub,
@@ -1884,45 +1906,135 @@ td b {
 .field-error,
 .pagination-bar,
 .user-result-count,
-.pie-center small {
-  font-size: 13px;
-}
-.panel-head h2,
-.form-panel h2,
-.qr-panel h2 {
-  font-size: 16px;
-}
+.pie-center small,
 .tag,
 th,
-.table-wrap table,
 .form-grid small,
 .question-row small,
 .quiet,
 .narrow h3,
-.text-action-button {
-  font-size: 13px;
-}
-.question-row {
+.text-action-button,
+.question-row > b {
   font-size: 14px;
 }
-.question-row > b {
-  font-size: 13px;
+.panel-head h2,
+.form-panel h2,
+.qr-panel h2 {
+  font-size: 18px;
 }
-.login-card h2 {
-  font-size: 27px;
+.table-wrap table {
+  font-size: 15px;
 }
+.login-card h2,
 .public-card h1 {
-  font-size: 27px;
+  font-size: 30px;
 }
 .public-fields label,
 .public-question > label {
-  font-size: 14px;
-}
-.public-card .eyebrow,
-.login-card .eyebrow,
-.copyright {
-  font-size: 13px;
+  font-size: 16px;
+  line-height: 1.55;
 }
 .pagination-bar .button {
-  font-size: 13px;
+  min-height: 38px;
+  font-size: 14px;
+}
+.stat-card {
+  position: relative;
+  overflow: hidden;
+}
+.stat-card::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  background: linear-gradient(90deg, #35a9ce, #68c69b 72%, #f3c46e);
+  content: "";
+}
+.stat-card::after {
+  position: absolute;
+  top: 16px;
+  right: 15px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(56, 169, 214, 0.09),
+    transparent 70%
+  );
+  content: "";
+  pointer-events: none;
+}
+.stat-card > * {
+  position: relative;
+  z-index: 1;
+}
+.panel-head {
+  margin-bottom: 7px;
+}
+table {
+  line-height: 1.55;
+}
+th {
+  color: #55738a;
+  letter-spacing: 0;
+}
+.searchbox,
+.user-toolbar select {
+  min-height: 42px;
+  border-radius: 9px;
+}
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.form-panel input,
+.form-panel select,
+.public-card input,
+.public-card select,
+.public-card textarea,
+.login-card input,
+.user-form input:not([type="checkbox"]),
+.user-form select {
+  min-height: 44px;
+  border-radius: 9px;
+}
+.login-aside {
+  background-image:
+    radial-gradient(
+      circle at 78% 27%,
+      rgba(84, 198, 218, 0.25),
+      transparent 16rem
+    ),
+    radial-gradient(
+      circle at 23% 88%,
+      rgba(87, 187, 147, 0.2),
+      transparent 20rem
+    ),
+    linear-gradient(145deg, #174b78 0%, #12365d 53%, #102b49 100%);
+}
+.public-card,
+.login-card {
+  line-height: 1.55;
+}
+@media (max-width: 760px) {
+  .page-header h1 {
+    font-size: 26px;
+  }
+  .page-header p {
+    font-size: 15px;
+  }
+  .stat-title {
+    font-size: 14px;
+  }
+  .stat-value {
+    font-size: 26px;
+  }
+  .login-message h1 {
+    font-size: 26px;
+  }
+  .public-card h1 {
+    font-size: 25px;
+  }
+  .button {
+    font-size: 15px;
+  }
 }
