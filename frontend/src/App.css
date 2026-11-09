@@ -1801,21 +1801,21 @@ td b {
 
 /* Comfortable reading scale for Sarabun, including dense admin screens. */
 .sidebar nav a {
-  font-size: 14px;
+  font-size: 15px;
 }
 .nav-label,
 .eyebrow {
-  font-size: 12px;
+  font-size: 13px;
 }
 .brand small,
 .profile-mini small,
 .top-user small,
 .crumb {
-  font-size: 12px;
+  font-size: 13px;
 }
 .profile-mini b,
 .top-user b {
-  font-size: 13px;
+  font-size: 14px;
 }
 .page-header h1 {
   font-size: 26px;
@@ -1824,13 +1824,13 @@ td b {
   font-size: 14px;
 }
 .button {
-  font-size: 14px;
+  font-size: 15px;
 }
 .stat-title {
-  font-size: 13px;
+  font-size: 14px;
 }
 .stat-value {
-  font-size: 26px;
+  font-size: 27px;
 }
 .stat-value small,
 .stat-foot,
@@ -1876,7 +1876,7 @@ td b {
 .user-active-toggle,
 .user-form input:not([type="checkbox"]),
 .user-form select {
-  font-size: 13px;
+  font-size: 14px;
 }
 .stat-value small,
 .table-sub,
@@ -1885,7 +1885,7 @@ td b {
 .pagination-bar,
 .user-result-count,
 .pie-center small {
-  font-size: 12px;
+  font-size: 13px;
 }
 .panel-head h2,
 .form-panel h2,
@@ -1900,13 +1900,13 @@ th,
 .quiet,
 .narrow h3,
 .text-action-button {
-  font-size: 12px;
-}
-.question-row {
   font-size: 13px;
 }
+.question-row {
+  font-size: 14px;
+}
 .question-row > b {
-  font-size: 12px;
+  font-size: 13px;
 }
 .login-card h2 {
   font-size: 27px;
@@ -1921,8 +1921,8 @@ th,
 .public-card .eyebrow,
 .login-card .eyebrow,
 .copyright {
-  font-size: 12px;
+  font-size: 13px;
 }
 .pagination-bar .button {
-  font-size: 12px;
+  font-size: 13px;
 }
